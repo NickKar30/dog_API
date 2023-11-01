@@ -39,5 +39,16 @@ post_db = [
 
 
 @app.get("/")
-def read_root():
-    return {"Successful Response"}
+def get_root():
+    return {}
+
+@app.post("/post")
+def get_post():
+    return post_db
+
+@app.get("/dog")
+def get_dogs(kind: DogType = None):
+    if kind:
+        return [dog for dog in dogs_db.values() if dog.kind == kind]
+    else:
+        return list(dogs_db.values())
