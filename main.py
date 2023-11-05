@@ -1,5 +1,5 @@
 from enum import Enum
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -48,7 +48,33 @@ def get_post():
 
 @app.get("/dog")
 def get_dogs(kind: DogType = None):
-    if kind:
+    if kind is not None:
         return [dog for dog in dogs_db.values() if dog.kind == kind]
     else:
         return list(dogs_db.values())
+
+@app.post("/dog")
+def create_dog(dog: Dog):
+    if dog.pk in list(dogs_db.keys()):
+        raise HTTPException(status_code=409,
+                            detail='The specified PK already exists.')
+    
+    dogs_db[dog.pk] = dog
+    return dog
+
+@app.get("/dog/{pk}")
+def get_dog_by_pk(pk: int):
+    if pk in dogs_db:
+        return dogs_db[pk]
+    else:
+        raise HTTPException(status_code=409,
+                            detail='Dog not found')
+
+@app.patch("/dog/{pk}")
+def update_dog(pk: int, dog: Dog):
+    if pk in dogs_db:
+        dogs_db[pk] = dog
+        return dog
+    else:
+        raise HTTPException(status_code=409,
+                            detail='Dog not found')
