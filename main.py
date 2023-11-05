@@ -40,7 +40,7 @@ post_db = [
 
 @app.get("/")
 def get_root():
-    return {}
+    return {"Hello!"}
 
 @app.post("/post")
 def get_post():
